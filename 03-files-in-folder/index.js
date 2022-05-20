@@ -1,16 +1,16 @@
 const { stdout, stderr } = process;
 const path = require('path');
-const fsd = require('fs');
-const fs = require('fs').promises;
+const fs = require('fs');
+const fsPromises = fs.promises;
 
 const directoryPath = path.join(__dirname, 'secret-folder');
 
-fsd.readdir(directoryPath, function (err, files) {
+fs.readdir(directoryPath, function (err, files) {
   if (err) process.exit(1);
   for (const file of files) {
     const testFN = path.join(__dirname, 'secret-folder', file);
     (async () => {
-      const stat = await fs.lstat(testFN);
+      const stat = await fsPromises.lstat(testFN);
       if (stat.isFile()) {
         let ext = path.extname(testFN);
         let fName = '';
@@ -20,9 +20,8 @@ fsd.readdir(directoryPath, function (err, files) {
         } else {
           fName = path.basename(testFN);
         }
-        stdout.write(`${fName} - ${ext} - ${stat.size}b\n`)
+        stdout.write(`${fName} - ${ext} - ${parseInt(stat.size / 1024)}.${stat.size % 1024}kb\n`)
       }
-      //console.log(stat);
     })().catch(console.error)
   }
 });
