@@ -3,11 +3,10 @@ const fsPromises = fs.promises;
 const path = require('path');
 const fromPath = path.join(__dirname, 'styles');
 const toPath = path.join(__dirname, 'project-dist');
-
-let outStream = null;
+const outFile = path.join(toPath, 'bundle.css');
 
 // проверка существования файла
-async function isExist(file) {
+const isExist = async (file) => {
   try {
     await fsPromises.access(file);
   } catch (e) {
@@ -17,7 +16,7 @@ async function isExist(file) {
 }
 
 // удаление файла
-async function rm(file) {
+const rm = async (file) => {
   try {
     await fsPromises.unlink(file);
   } catch (e) {
@@ -26,30 +25,37 @@ async function rm(file) {
   }
 }
 
+// чтение файла в строку
+const fileToString = (filename) => {
+  const read = async (stream) => {
+    stream.setEncoding('utf8');
+    let data = '';
+    for await (const chunk of stream) {
+      data += chunk;
+    }
+    return data;
+  }
+
+  return read(fs.createReadStream(filename)).catch(console.error);
+}
+
+// сборка CSS
+const bundleCss = async (src, dst) => {
+  const outStream = new fs.createWriteStream(dst);
+  await fs.readdir(src, async (err, files) => {
+    if (err) process.exit(1);
+    const cssFiles = files.filter(e => path.extname(e).toLowerCase() === '.css');
+    for (const file of cssFiles) {
+      const string = await fileToString(path.join(src, file));
+      outStream.write(string + '\r\n');
+    }
+  });
+}
+
 // main
 (async () => {
-  const outFile = path.join(toPath, 'bundle.css');
   if (await isExist(outFile)) {
     await rm(outFile);
   }
-  outStream = new fs.createWriteStream(outFile);
-  fs.readdir(fromPath, function (err, files) {
-    if (err) process.exit(1);
-    const cssFiles = files.filter(e => path.extname(e).toLowerCase() === '.css')
-    for (const file of cssFiles) {
-      let string = '';
-      let inStream = new fs.ReadStream(path.join(fromPath, file));
-
-      inStream.on('data', function (data) {
-        string += data.toString();
-      });
-
-      inStream.on('end', function () {
-        if (string.slice(-1) !== '\n') string += '\n';
-        string += '\n';
-        outStream.write(string);
-      });
-
-    }
-  });
+  await bundleCss(fromPath, outFile);
 })();
