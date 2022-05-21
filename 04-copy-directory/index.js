@@ -5,7 +5,7 @@ const fromPath = path.join(__dirname, 'files');
 const toPath = path.join(__dirname, 'files-copy');
 
 // проверка существования директории
-async function isExist(dir) {
+const isExist = async (dir) => {
   try {
     await fsPromises.access(dir);
   } catch (e) {
@@ -15,7 +15,7 @@ async function isExist(dir) {
 }
 
 // удаление директории
-async function rd(dir) {
+const rd = async (dir) => {
   try {
     await fsPromises.rmdir(dir, { recursive: true });
   } catch (e) {
@@ -25,7 +25,7 @@ async function rd(dir) {
 }
 
 // создание директории
-async function md(dir) {
+const md = async (dir) => {
   try {
     await fsPromises.mkdir(dir);
   } catch (e) {
@@ -34,21 +34,29 @@ async function md(dir) {
   }
 }
 
+// копирование директории с рекурсией и параллелизмом
+const copyDir = async (src, dst) => {
+  const [entries] = await Promise.all([
+    fsPromises.readdir(src, { withFileTypes: true }),
+    fsPromises.mkdir(dst, { recursive: true }),
+  ]);
+
+  await Promise.all(
+    entries.map((entry) => {
+      const srcPath = path.join(src, entry.name);
+      const dstPath = path.join(dst, entry.name);
+      return entry.isDirectory()
+        ? copyDir(srcPath, dstPath)
+        : fsPromises.copyFile(srcPath, dstPath);
+    })
+  )
+}
+
 //main
 (async () => {
   if (await isExist(toPath)) {
     await rd(toPath);
   }
   await md(toPath);
-  fs.readdir(fromPath, function (err, files) {
-    if (err) process.exit(1);
-    for (const file of files) {
-      fs.copyFile(path.join(fromPath, file), path.join(toPath, file), (err) => {
-        if (err) {
-          console.error('Ошибка копирования файла: ' + file);
-          throw err;
-        }
-      });
-    }
-  });
+  await copyDir(fromPath, toPath);
 })();
