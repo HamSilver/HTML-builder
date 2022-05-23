@@ -20,9 +20,9 @@ fs.readdir(directoryPath, function (err, files) {
         } else {
           fName = path.basename(testFN);
         }
-        stdout.write(`${fName} - ${ext} - ${parseInt(stat.size / 1024)}.${stat.size % 1024} kb\n`)
+        stdout.write(`${fName} - ${ext} - ${parseInt(stat.size / 1024)}.${stat.size % 1024} kb\n`);
       }
-    })().catch(console.error)
+    })().catch(console.error);
   }
 });
 

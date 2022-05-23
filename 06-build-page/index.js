@@ -23,8 +23,8 @@ const copyDir = async (src, dst) => {
         ? copyDir(srcPath, dstPath)
         : fsPromises.copyFile(srcPath, dstPath);
     })
-  )
-}
+  );
+};
 
 // проверка существования директории
 const isExist = async (dir) => {
@@ -34,7 +34,7 @@ const isExist = async (dir) => {
     return false;
   }
   return true;
-}
+};
 
 // удаление директории
 const rd = async (dir) => {
@@ -44,7 +44,7 @@ const rd = async (dir) => {
     console.error('Ошибка удаления директории');
     process.exit(500);
   }
-}
+};
 
 // создание директории
 const md = async (dir) => {
@@ -54,7 +54,7 @@ const md = async (dir) => {
     console.error('Ошибка создания директории');
     process.exit(404);
   }
-}
+};
 
 // сборка CSS
 const bundleCss = async (src, dst) => {
@@ -62,13 +62,13 @@ const bundleCss = async (src, dst) => {
   const outStream = new fs.createWriteStream(outFile);
   await fs.readdir(src, async (err, files) => {
     if (err) process.exit(1);
-    const cssFiles = files.filter(e => path.extname(e).toLowerCase() === '.css');
+    const cssFiles = files.filter(e => path.extname(e).toLowerCase() === '.css').reverse();
     for (const file of cssFiles) {
       const string = await fileToString(path.join(src, file));
       outStream.write(string + '\r\n');
     }
   });
-}
+};
 
 // чтение файла в строку
 const fileToString = (filename) => {
@@ -79,10 +79,10 @@ const fileToString = (filename) => {
       data += chunk;
     }
     return data;
-  }
+  };
 
   return read(fs.createReadStream(filename)).catch(console.error);
-}
+};
 
 // сборка html
 const fillTemplate = async (tpl, src, dst) => {
@@ -95,18 +95,18 @@ const fillTemplate = async (tpl, src, dst) => {
     for (const file of cssFiles) {
       const curElemName = path.basename(file, ext);
       const curElem = await fileToString(path.join(src, file));
-      const addIndent = (str, indent) => str.split('\r\n').join('\r\n' + indent);
-      tpl = tpl.split('\r\n').map(line => {
-        if (new RegExp(`\{\{${curElemName}\}\}`).test(line)) {
+      const addIndent = (str, indent) => str.split(/\r?\n/).join('\r\n' + indent);
+      tpl = tpl.split(/\r?\n/).map(line => {
+        if (new RegExp(`{{${curElemName}}}`).test(line)) {
           const indent = line.slice(0, line.search(/\S/));
-          line = line.replace(new RegExp(`\{\{${curElemName}\}\}`, 'g'), addIndent(curElem, indent));
+          line = line.replace(new RegExp(`{{${curElemName}}}`, 'g'), addIndent(curElem, indent));
         }
         return line;
       }).join('\r\n');
     }
     outStream.write(tpl);
   });
-}
+};
 
 // main
 (async () => {

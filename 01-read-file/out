@@ -1,0 +1,9 @@
+
+D:\rss\HTML-builder\01-read-file\index.js
+  8:1  error  Expected indentation of 2 spaces but found 4  indent
+  9:1  error  Expected indentation of 2 spaces but found 4  indent
+
+тЬЦ 2 problems (2 errors, 0 warnings)
+  2 errors and 0 warnings potentially fixable with the `--fix` option.
+
+Завершить выполнение пакетного файла [Y(да)/N(нет)]? Завершить выполнение пакетного файла [Y(да)/N(нет)]? 

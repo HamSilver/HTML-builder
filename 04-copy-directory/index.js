@@ -12,7 +12,7 @@ const isExist = async (dir) => {
     return false;
   }
   return true;
-}
+};
 
 // удаление директории
 const rd = async (dir) => {
@@ -22,7 +22,7 @@ const rd = async (dir) => {
     console.error('Ошибка удаления директории');
     process.exit(500);
   }
-}
+};
 
 // создание директории
 const md = async (dir) => {
@@ -32,7 +32,7 @@ const md = async (dir) => {
     console.error('Ошибка создания директории');
     process.exit(404);
   }
-}
+};
 
 // копирование директории с рекурсией и параллелизмом
 const copyDir = async (src, dst) => {
@@ -49,8 +49,8 @@ const copyDir = async (src, dst) => {
         ? copyDir(srcPath, dstPath)
         : fsPromises.copyFile(srcPath, dstPath);
     })
-  )
-}
+  );
+};
 
 //main
 (async () => {

@@ -13,7 +13,7 @@ const isExist = async (file) => {
     return false;
   }
   return true;
-}
+};
 
 // удаление файла
 const rm = async (file) => {
@@ -23,7 +23,7 @@ const rm = async (file) => {
     console.error('Ошибка удаления файл');
     process.exit(500);
   }
-}
+};
 
 // чтение файла в строку
 const fileToString = (filename) => {
@@ -34,10 +34,10 @@ const fileToString = (filename) => {
       data += chunk;
     }
     return data;
-  }
+  };
 
   return read(fs.createReadStream(filename)).catch(console.error);
-}
+};
 
 // сборка CSS
 const bundleCss = async (src, dst) => {
@@ -50,7 +50,7 @@ const bundleCss = async (src, dst) => {
       outStream.write(string + '\r\n');
     }
   });
-}
+};
 
 // main
 (async () => {
